@@ -44,5 +44,38 @@ router.post("/signup", (req, res, next) => {
     
       // create the user
     });
-    
-    module.exports = router;
+
+
+router.post("/login", (req, res, next) => {
+    const { username, password } = req.body;
+
+    if ( !username || !password ) {
+        return res.status(400).json({ 
+            errorMessage: `Hey. Did you forget something? ${
+                username ? 'password' : 'username'
+            }`,
+        });
+    }
+
+    User.findOne({ username })
+    .then((user) => {
+        if(!user){
+            return res.json({errorMessage: "User doesn't exist."});
+        }
+            // saving user with matched password on a session
+        bcrypt.compare(password, user.password)
+            .then((isSamePassword) => {
+                if(!isSamePassword){
+                    return res.json({ errorMessage: "Wrong password!" });
+                }
+
+                req.session.user = user;
+                return res.json(user);
+            }) 
+    })
+    .catch((error) => {
+        next(error);
+    });
+});    
+
+module.exports = router;
