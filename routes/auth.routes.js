@@ -78,4 +78,14 @@ router.post("/login", (req, res, next) => {
     });
 });    
 
+router.post('/logout', (req, res, next) => {
+    req.session.destroy((error) => {
+        if(error){
+            return res.status(500).json({errorMessage: `Something went wrong with logout: ${error.message}`,
+        })
+        }
+        res.json({ successMessage: 'Logged out!' })
+    });
+});
+
 module.exports = router;
